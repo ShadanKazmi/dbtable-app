@@ -24,44 +24,57 @@ export default function Table() {
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     useEffect(() => {
-        fetch(`https://api.artic.edu/api/v1/artworks?page=${page}`)
-            .then((response) => response.json())
-            .then((data) => {
-                const artworksData = data.data.map((data: any) => ({
-                    id: data.id,
-                    title: data.title,
-                    artist_display: data.artist_display,
-                    place_of_origin: data.place_of_origin,
-                    inscriptions: data.inscriptions,
-                    date_start: data.date_start,
-                    date_end: data.date_end,
-                }));
-                setArtworks(artworksData);
-                setTotalRecords(data.pagination.total);
-                setTotalPages(data.pagination.total_pages);
-                setRowsPerPage(data.pagination.limit);
-            });
+        fetchData(page);
     }, [page]);
+
+    const fetchData = async (pageNum: number) => {
+        try {
+            const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${pageNum}`);
+            const data = await response.json();
+            const artworksData = data.data.map((item: any) => ({
+                id: item.id,
+                title: item.title,
+                artist_display: item.artist_display,
+                place_of_origin: item.place_of_origin,
+                inscriptions: item.inscriptions,
+                date_start: item.date_start,
+                date_end: item.date_end,
+            }));
+
+            setArtworks(artworksData);
+            setTotalRecords(data.pagination.total);
+            setTotalPages(data.pagination.total_pages);
+            setRowsPerPage(data.pagination.limit);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+        }
+    };
 
     const onPageChange = (event: any) => {
         setPage(event.page + 1);
     };
 
     const fetchAdditionalPages = async (startPage: number, numPages: number) => {
-        const allArtworks: Artwork[] = [];
+        let allArtworks: Artwork[] = [];
         for (let i = 0; i < numPages; i++) {
-            const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${startPage + i}`);
-            const data = await response.json();
-            const artworksData = data.data.map((data: any) => ({
-                id: data.id,
-                title: data.title,
-                artist_display: data.artist_display,
-                place_of_origin: data.place_of_origin,
-                inscriptions: data.inscriptions,
-                date_start: data.date_start,
-                date_end: data.date_end,
-            }));
-            allArtworks.push(...artworksData);
+            try {
+                const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${startPage + i}`);
+                const data = await response.json();
+                const artworksData = data.data.map((item: any) => ({
+                    id: item.id,
+                    title: item.title,
+                    artist_display: item.artist_display,
+                    place_of_origin: item.place_of_origin,
+                    inscriptions: item.inscriptions,
+                    date_start: item.date_start,
+                    date_end: item.date_end,
+                }));
+                allArtworks = [...allArtworks, ...artworksData];
+            } catch (error) {
+                console.error('Failed to fetch additional pages:', error);
+                // Optionally, handle errors or stop further fetching if needed
+                break;
+            }
         }
         return allArtworks;
     };
