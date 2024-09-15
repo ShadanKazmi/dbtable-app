@@ -18,7 +18,13 @@ body {
 
 .card {
     background: var(--surface-card);
-    padding: 2rem;
     border-radius: 10px;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.paginator-custom {
+    /* padding: 20px;          */
+    margin-top: 10px;
+    font-size: 1rem;  
+    text-align: center;
 }

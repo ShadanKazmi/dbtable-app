@@ -56,6 +56,12 @@ export default function Table() {
 
     const fetchAdditionalPages = async (startPage: number, numPages: number) => {
         let allArtworks: Artwork[] = [];
+
+        //Logic for selecting pages that are not yet rendered.
+        //Ensuring that the API does not get called everytime one by one 
+        //and is sequentially fetched so it does not overload the network call
+
+
         for (let i = 0; i < numPages; i++) {
             try {
                 const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${startPage + i}`);
@@ -72,7 +78,6 @@ export default function Table() {
                 allArtworks = [...allArtworks, ...artworksData];
             } catch (error) {
                 console.error('Failed to fetch additional pages:', error);
-                // Optionally, handle errors or stop further fetching if needed
                 break;
             }
         }
@@ -103,7 +108,7 @@ export default function Table() {
     };
 
     return (
-        <div className="p-4 bg-white rounded shadow-lg overflow-x-auto">
+        <div className='card'>
             <div className="mb-4 relative">
                 <button 
                     onClick={() => setDropdownVisible(!dropdownVisible)} 
@@ -147,12 +152,13 @@ export default function Table() {
                 paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
                 currentPageReportTemplate="Page {currentPage} of {totalPages}"
                 className="table-auto w-full border border-gray-200 mb-30"
+                paginatorClassName="paginator-custom" 
             >
                 <Column 
                     selectionMode="multiple" 
                     headerStyle={{ width: '3rem' }} 
                     className="bg-gray-100 text-gray-600"
-                    bodyStyle={{ padding: '0.5rem', borderBottom: '1px solid #ddd' }} // Border between rows
+                    bodyStyle={{ padding: '0.5rem', borderBottom: '1px solid #ddd' }} 
                 />
                 <Column 
                     field="title" 
